@@ -123,10 +123,25 @@ $(document).ready(function () {
 </div>
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+<div id="practical-machine-learning-prediction-assignment-writeup" class="section level2">
+<h2>Practical Machine Learning Prediction Assignment Writeup</h2>
+<p>This is Prediction Assignment Writeup. For problem statement and Data sources, see README.md.</p>
+<p><strong>Goal</strong> To predict the manner in which 6 participants did the exercise. This is the “classe” variable in the training set. One should create a report describing how (s)he built model, how (s)he used cross validation, what (s)he think the expected out of sample error is, and why (s)he made the choices for a classifer.</p>
+<div id="model-building" class="section level3">
+<h3>Model building</h3>
+<p><strong>Loading the Data</strong> from the Dataset</p>
+<pre><code>trainUrl &lt;- &quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;
+testUrl  &lt;- &quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;</code></pre>
+<p><strong>Processing the Data</strong></p>
+<pre><code>set.seed(1234)</code></pre>
+<p><strong>Handling Missing Values</strong> : NA option used “na.omit”</p>
+</div>
+<div id="cross-validation" class="section level3">
+<h3>Cross Validation</h3>
+</div>
+<div id="expected-out-of-sample-error" class="section level3">
+<h3>Expected out of Sample Error</h3>
+<p><strong>Libraries Used</strong></p>
 <pre class="r"><code>summary(cars)</code></pre>
 <pre><code>##      speed           dist       
 ##  Min.   : 4.0   Min.   :  2.00  
@@ -135,6 +150,7 @@ $(document).ready(function () {
 ##  Mean   :15.4   Mean   : 42.98  
 ##  3rd Qu.:19.0   3rd Qu.: 56.00  
 ##  Max.   :25.0   Max.   :120.00</code></pre>
+</div>
 </div>
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
