@@ -17,26 +17,88 @@ This is Prediction Assignment Writeup. For problem statement and Data sources, s
 
 ### Model building
 
-**Loading the Data** from the Dataset
+**Libraries Used**
+```{r caret}
+library(caret)
 ```
-trainUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
-testUrl  <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+**Loading the Data** from the Dataset
+```{r loadingTheData,cache=TRUE}
+trainingData <- read.csv(url("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"), header = TRUE, sep = ",")
+testingData <- read.csv(url("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"), header = TRUE, sep = ",")
 ```
 
 **Processing the Data**
+
+<i>Removing id variable</i>
+```{r}
+trainingData <- trainingData[c(-1)]
+testingData <- testingData[c(-1)]
 ```
+
+<i>On looking at the training data, you can see few column values is "#DIV/0!"</i>
+```{r, warning=FALSE}
+trainingData[trainingData =="#DIV/0!"] <- 0
+```
+
+<i>Finding if there exists near-zero variance predictors in the data set.</i>
+
+```{r,echo=FALSE}
+options(width=130)
+```
+
+```{r nearZeroVariableExistanceFinder,cache=TRUE}
+nsv <- nearZeroVar(trainingData)
+names(trainingData)[nsv]
+```
+
+<i>As there exists near-zero variance predictors, let us remove them
+```{r removeNSV}
+trainingData <- trainingData [-nsv]
+testingData <- testingData[-nsv]
+```
+
+<i>Finding if there exists NAs in the data set.</i>
+```{r,echo=FALSE}
+options(width=80)
+```
+
+```{r}
+##Only a subset of trainingData is shown below, for better viewing purpose only.
+summary(trainingData[,c(10:16)])
+```
+
+<i>As there exists NAs in the data set, let us omit all those variables which have very high NAs</i>
+```{r}
+##Getting index of all the variables having high number of NAs
+myNAVars <- names(trainingData) %in% c("max_picth_belt","min_roll_belt","max_roll_belt","min_pitch_belt","amplitude_roll_belt","amplitude_pitch_belt","var_total_accel_belt","avg_roll_belt","stddev_roll_belt","var_roll_belt","avg_pitch_belt","stddev_pitch_belt","var_pitch_belt","avg_yaw_belt","stddev_yaw_belt","var_yaw_belt","var_accel_arm","max_picth_arm","max_yaw_arm","min_yaw_arm","amplitude_yaw_arm","max_roll_dumbbell","max_picth_dumbbell","min_roll_dumbbell","min_pitch_dumbbell","amplitude_roll_dumbbell","amplitude_pitch_dumbbell","var_accel_dumbbell","avg_roll_dumbbell","stddev_roll_dumbbell","var_roll_dumbbell","avg_pitch_dumbbell","stddev_pitch_dumbbell","var_pitch_dumbbell","avg_yaw_dumbbell","stddev_yaw_dumbbell","var_yaw_dumbbell","max_picth_forearm","min_pitch_forearm","amplitude_pitch_forearm","var_accel_forearm")
+trainingData<-trainingData[,!myNAVars]
+testingData<-testingData[,!myNAVars]
+```
+
+### Cross-Validation
+
+Cross-Validation has been performed by partioning training data set into 2 parts,
+Training (70% of the original dataset), Validation (30% of the dataset). We will train various models on Training dataset and test on the Validation dataset. Model having best accuracy will be tested on testingData.
+
+```{r}
+#Creating indices for the 2 dataset 
 set.seed(1234)
+inTrain <- createDataPartition(y=trainingData$classe,p=0.7,list = FALSE)
+Training <- trainingData[inTrain, ]
+Validation <- trainingData[-inTrain, ]
 ```
 
-**Handling Missing Values** : NA option used "na.omit"
-
-### Cross Validation
+### Building Various Models
 
 ### Expected out of Sample Error
 
-**Libraries Used**
+
 ```{r cars}
-summary(cars)
+dim(trainingData)
+dim(Training)
+dim(Validation)
+dim(testingData)
 ```
 
 ## Including Plots
