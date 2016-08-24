@@ -39,6 +39,8 @@ testingData <- testingData[c(-1)]
 <i>On looking at the training data, you can see few column values is "#DIV/0!"</i>
 ```{r, warning=FALSE}
 trainingData[trainingData =="#DIV/0!"] <- 0
+trainingData[trainingData =="NA"] <- 0
+trainingData[trainingData ==""] <- 0
 ```
 
 <i>Finding if there exists near-zero variance predictors in the data set.</i>
@@ -58,7 +60,7 @@ trainingData <- trainingData [-nsv]
 testingData <- testingData[-nsv]
 ```
 
-<i>Finding if there exists NAs in the data set.</i>
+<i>Discarding Features with many missing values</i>
 ```{r,echo=FALSE}
 options(width=80)
 ```
@@ -76,23 +78,25 @@ trainingData<-trainingData[,!myNAVars]
 testingData<-testingData[,!myNAVars]
 ```
 
+<i>On further looking at the data, some variable seems to be descriptive only, with no relevance to be predication</i>
+```{r}
+myDescVars <- names(trainingData) %in% c("user_name", "raw_timestamp_part_1", "raw_timestamp_part_2",    "cvtd_timestamp", "new_window", "num_window")
+trainingData<-trainingData[,!myDescVars]
+testingData<-testingData[,!myDescVars]
+```
+
 ### Cross-Validation
 
 Cross-Validation has been performed by partioning training data set into 2 parts,
 Training (70% of the original dataset), Validation (30% of the dataset). We will train various models on Training dataset and test on the Validation dataset. Model having best accuracy will be tested on testingData.
 
-```{r}
+```{r, cache=TRUE}
 #Creating indices for the 2 dataset 
-set.seed(1234)
-inTrain <- createDataPartition(y=trainingData$classe,p=0.7,list = FALSE)
+set.seed(1499)
+inTrain <- createDataPartition(y=trainingData$classe,p=0.8,list = FALSE)
 Training <- trainingData[inTrain, ]
 Validation <- trainingData[-inTrain, ]
 ```
-
-### Building Various Models
-
-### Expected out of Sample Error
-
 
 ```{r cars}
 dim(trainingData)
@@ -101,12 +105,35 @@ dim(Validation)
 dim(testingData)
 ```
 
-## Including Plots
+### Building Various Models
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+<i>As after Processing the data, variables left have only numeric values. So, Decision Tree or Random Forest algorithm should work fine.</i><br/>
+<i>Using Decision Tree algorithm for prediction</i>
+```{r decisionTreeTrain, cache=TRUE}
+modFitDT <- train(classe ~., method="rpart",data=Training)
+library(rattle)
+fancyRpartPlot(modFitDT$finalModel)
+predictionsDT <- predict(modFitDT, Validation)
+confusionMatrix(predictionsDT , Validation$classe)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+<i>Using Random Forest algorithm for prediction</i>
+```{r randonForestTrain, cache=TRUE}
+modFitRF <- train(classe ~., method="rf",data=Training)  
+#print(modFitRF$finalModel)
+#predictionsRF <- predict(modFitRF, Validation)
+#confusionMatrix(predictionsRF , Validation$classe)
+```
+
+### Final Model Selection
+As expected Random Forest Algorithm has performed better than Decision Tree Algorithm. So we choose Random Forest model as final model.
+
+### Expected out of Sample Error
+The expected out-of-sample error is calculated as 1 - accuracy for predictions made against the cross-validation set. Our Test data set comprises 20 cases. With an accuracy above 99% on our cross-validation data by random forest model, we can expect that very few, or none, of the test samples will be missclassified.
+
+
+### Test Prediction Results
+```{r}
+# predictionsFinal <- predict(modFitRF, testingData)
+# predictionsFinal
+```
