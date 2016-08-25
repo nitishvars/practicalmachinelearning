@@ -39,8 +39,6 @@ testingData <- testingData[c(-1)]
 <i>On looking at the training data, you can see few column values is "#DIV/0!"</i>
 ```{r, warning=FALSE}
 trainingData[trainingData =="#DIV/0!"] <- 0
-trainingData[trainingData =="NA"] <- 0
-trainingData[trainingData ==""] <- 0
 ```
 
 <i>Finding if there exists near-zero variance predictors in the data set.</i>
@@ -110,30 +108,38 @@ dim(testingData)
 <i>As after Processing the data, variables left have only numeric values. So, Decision Tree or Random Forest algorithm should work fine.</i><br/>
 <i>Using Decision Tree algorithm for prediction</i>
 ```{r decisionTreeTrain, cache=TRUE}
-modFitDT <- train(classe ~., method="rpart",data=Training)
-library(rattle)
-fancyRpartPlot(modFitDT$finalModel)
-predictionsDT <- predict(modFitDT, Validation)
+#### Due to Unknown reason train method was giving 48% accuracy
+#modFitDT <- train(classe ~., method="rpart",data=Training)
+#library(rattle)
+#fancyRpartPlot(modFitDT$finalModel)
+library(rpart)
+modFitDT <- rpart(classe ~., method="class", data=Training)
+library(rpart.plot)
+# So many levels were there so image was not coming properly
+#rpart.plot(modFitDT, main="Classification Tree")
+print(modFitDT)
+predictionsDT <- predict(modFitDT, Validation, type="class")
 confusionMatrix(predictionsDT , Validation$classe)
 ```
 
 <i>Using Random Forest algorithm for prediction</i>
 ```{r randonForestTrain, cache=TRUE}
-modFitRF <- train(classe ~., method="rf",data=Training)  
-#print(modFitRF$finalModel)
-#predictionsRF <- predict(modFitRF, Validation)
-#confusionMatrix(predictionsRF , Validation$classe)
+library("randomForest")
+modFitRF <- randomForest(classe ~., method="class", data=Training)
+print(modFitRF)
+predictionsRF <- predict(modFitRF, Validation, type="class")
+confusionMatrix(predictionsRF , Validation$classe)
 ```
 
 ### Final Model Selection
-As expected Random Forest Algorithm has performed better than Decision Tree Algorithm. So we choose Random Forest model as final model.
+As expected Random Forest Algorithm has performed better than Decision Tree Algorithm (Random Forest Algorithm Accuracy was 99.54% in comparision to Decision Tree Algorithm Accuracy 74.05%). So we choose Random Forest model as final model.
 
 ### Expected out of Sample Error
 The expected out-of-sample error is calculated as 1 - accuracy for predictions made against the cross-validation set. Our Test data set comprises 20 cases. With an accuracy above 99% on our cross-validation data by random forest model, we can expect that very few, or none, of the test samples will be missclassified.
 
 
 ### Test Prediction Results
-```{r}
-# predictionsFinal <- predict(modFitRF, testingData)
-# predictionsFinal
+```{r testPrediction}
+predictionsFinal <- predict(modFitRF, testingData)
+predictionsFinal
 ```
