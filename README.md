@@ -8,3 +8,5 @@ The test data are available here:
 https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv <br/>
 
 <b> Data Source </b>  http://groupware.les.inf.puc-rio.br/har <br/>
+
+For Solution Please check, https://nitishvars.github.io/practicalmachinelearning/
